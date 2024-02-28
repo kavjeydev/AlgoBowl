@@ -9,5 +9,5 @@ def verifyOutput(graph):
         G.remove_node(V[i])
     return nx.is_directed_acyclic_graph(G)
 
-G = createGraph()
+G = createGraph.createGraph()
 print(verifyOutput(G))
