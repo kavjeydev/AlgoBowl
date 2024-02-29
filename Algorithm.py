@@ -2,6 +2,7 @@ import createGraph as cg
 import networkx as nx
 import time
 import os
+import threading
 
 def checkRepeats(c, l):
     for cycle in c:
@@ -14,15 +15,18 @@ def checkRepeats(c, l):
     return False
 
 
-def deleteNodes(G):
+def deleteNodes(G, stop):
     cycles = nx.simple_cycles(G)
     c2 = []
     d = {}
     for i in G.nodes:
         d[i] = 0
+    start = time.time()
     for cycle in cycles:
         c2.append(cycle)
         for i in cycle:
+            if (time.time() - start > 3):
+                return [], True
             d[i] += 1
     list = []
 
@@ -35,7 +39,7 @@ def deleteNodes(G):
                 for i in cycle:
                     d[i] = d.get(i)-1
 
-    return list
+    return list, False
 
 def Algorithm():
     start = time.time()
@@ -65,10 +69,12 @@ def Algorithm():
     print(f"Total Time to Find Solution was {run_end-run_start} seconds.")
 
 def autoAlgorithm(folder):
+    stop = False
     files = os.listdir(folder)
     for i in files:
         start = time.time()
         G = cg.createGraphFile(f"{folder}/{i}")
+        n = G.number_of_nodes()
         end = time.time()
         print(f"Time to Create Graph was {end-start} seconds.")
 
@@ -79,7 +85,9 @@ def autoAlgorithm(folder):
         while(nx.is_directed_acyclic_graph(G) == False):
             cycleCount+=1
             cycle_start = time.time()
-            listToDelete = deleteNodes(G)
+            listToDelete, stop = deleteNodes(G, stop)
+            if stop:
+                break
             cycle_end = time.time()
             print(f"Time to Find Nodes to Delete in Cycle {cycleCount}: {cycle_end-cycle_start} s")
             for j in range(len(listToDelete)):
@@ -88,10 +96,15 @@ def autoAlgorithm(folder):
             count += len(listToDelete)
             print(count) # Progress Check
 
-        output = f"/outputs/{i[:-4]}_output.txt"
+        output = f"./outputs/{i[:-4]}_output.txt"
         if os.path.isfile(output):
             os.remove(output)
-        f = open(output, "x")
-        f.write(f"{count}\n{list}")
+        f = open(output, "w")
+        if (len(listToDelete) == 0):
+            f.write(f"{n - 1}\n")
+            for i in range(1, n):
+                f.write(f"{i} ")
+        else:
+            f.write(f"{count}\n{list}")
         run_end = time.time()
         print(f"Total Time to Find Solution was {run_end-run_start} seconds.")
