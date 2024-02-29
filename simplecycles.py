@@ -2,7 +2,7 @@ import networkx as nx
 import fileinput
 
 
-file = open("C3PO/input_group784.txt", "r") # change file name
+file = open("C3PO/input_group784.txt", "r")
 file_content = file.read().split("\n")
 
 num_courses_required = int(file_content[0]) # first like of input file is # courses required
@@ -21,8 +21,13 @@ print(tuples)
 
 cycles = ((nx.simple_cycles(G)))
 
-
+count_dict = {}
 i = 1
 for cycle in cycles:
-    print(cycle)
+    for j in range(len(cycle)):
+        if cycle[j] in count_dict:
+            count_dict[cycle[j]] += 1
+        else:
+            count_dict[cycle[j]] = 1
 
+print(count_dict)
