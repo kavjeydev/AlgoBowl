@@ -37,7 +37,7 @@ def createGraphFile():
     return Graph
 
 def createGraph():
-    choice = input("Text(0) or File(1): ")
+    choice = int(input("Text(0) or File(1): "))
     if choice == 0:
         return createGraphText()
     elif choice == 1:
@@ -45,5 +45,3 @@ def createGraph():
     else:
         print("Invalid Choice, Try Again!")
         return createGraph()
-
-createGraph()
