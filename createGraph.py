@@ -12,7 +12,7 @@ def createGraphText():
         line = input().split()
         numE = int(line[0])
         for j in range(numE):
-            Graph.add_edge(i+1,line[j+1])
+            Graph.add_edge(int(i+1),int(line[j+1]))
     print("All Lines pasted.")
 
     G = nx.nx_pydot.to_pydot(Graph)
