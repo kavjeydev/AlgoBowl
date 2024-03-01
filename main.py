@@ -5,4 +5,4 @@ import threading
 import time
 
 
-A.autoAlgorithm("test")
+A.autoAlgorithm("test2")

@@ -15,7 +15,7 @@ def checkRepeats(c, l):
     return False
 
 
-def deleteNodes(G, stop):
+def deleteNodes(G, timeout):
     cycles = nx.simple_cycles(G)
     c2 = []
     d = {}
@@ -25,7 +25,8 @@ def deleteNodes(G, stop):
     for cycle in cycles:
         c2.append(cycle)
         for i in cycle:
-            if (time.time() - start > 3):
+            if (time.time() - start > 5):
+                print("Here")
                 return [], True
             d[i] += 1
     list = []
@@ -69,7 +70,7 @@ def Algorithm():
     print(f"Total Time to Find Solution was {run_end-run_start} seconds.")
 
 def autoAlgorithm(folder):
-    stop = False
+    timeout = False
     files = os.listdir(folder)
     for i in files:
         start = time.time()
@@ -85,8 +86,8 @@ def autoAlgorithm(folder):
         while(nx.is_directed_acyclic_graph(G) == False):
             cycleCount+=1
             cycle_start = time.time()
-            listToDelete, stop = deleteNodes(G, stop)
-            if stop:
+            listToDelete, timeout = deleteNodes(G, timeout)
+            if timeout:
                 break
             cycle_end = time.time()
             print(f"Time to Find Nodes to Delete in Cycle {cycleCount}: {cycle_end-cycle_start} s")
@@ -96,15 +97,39 @@ def autoAlgorithm(folder):
             count += len(listToDelete)
             print(count) # Progress Check
 
+
         output = f"./outputs/{i[:-4]}_output.txt"
         if os.path.isfile(output):
             os.remove(output)
         f = open(output, "w")
-        if (len(listToDelete) == 0):
-            f.write(f"{n - 1}\n")
-            for i in range(1, n):
-                f.write(f"{i} ")
+
+        if timeout:
+            removedNodes = []
+            while(nx.is_directed_acyclic_graph(G) == False):
+                degrees = []
+                for tup in G.degree():
+                    degrees.append(tup)
+
+                degrees.sort(key=lambda x: x[1])
+
+                n = len(degrees)
+                removedNodes.append(degrees[n - 1][0])
+                G.remove_node(degrees[n - 1][0])
+
+            print(removedNodes)
+
+            output = f"./outputs/{i[:-4]}_output.txt"
+            f = open(output, "w")
+            f.write(f"{len(removedNodes)}\n")
+            for node in removedNodes:
+                f.write(f"{node} ")
         else:
-            f.write(f"{count}\n{list}")
+            if (len(listToDelete) == 0):
+                f.write(f"{n - 1}\n")
+                for i in range(1, n):
+                    f.write(f"{i} ")
+            else:
+                f.write(f"{count}\n{list}")
+
         run_end = time.time()
         print(f"Total Time to Find Solution was {run_end-run_start} seconds.")
